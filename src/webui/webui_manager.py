@@ -93,6 +93,7 @@ class WebuiManager:
             json.dump(cur_settings, fw, indent=4)
 
         return os.path.join(self.settings_save_dir, f"{config_name}.json")
+    
 
     def load_config(self, config_path: str):
         """
