@@ -50,8 +50,6 @@ def create_agent_settings_tab(webui_manager: WebuiManager):
     input_components = set(webui_manager.get_components())
     tab_components = {}
 
-    
-
     with gr.Group():
         with gr.Row():
             llm_provider = gr.Dropdown(
@@ -69,9 +67,6 @@ def create_agent_settings_tab(webui_manager: WebuiManager):
                 allow_custom_value=True,
                 info="Select a model in the dropdown options or directly type a custom model name"
             )
-        
-            
-
         with gr.Row():
             llm_base_url = gr.Textbox(
                 label="Base URL",
@@ -85,7 +80,6 @@ def create_agent_settings_tab(webui_manager: WebuiManager):
                 info="Your API key (leave blank to use .env)"
             )
 
-            
     with gr.Row():
         max_steps = gr.Slider(
             minimum=1,
@@ -106,26 +100,18 @@ def create_agent_settings_tab(webui_manager: WebuiManager):
             interactive=True
         )
 
-    
     tab_components.update(dict(
-
         llm_provider=llm_provider,
         llm_model_name=llm_model_name,
+        llm_base_url=llm_base_url,
         llm_api_key=llm_api_key,
+        max_steps=max_steps,
         max_actions=max_actions,
-      
     ))
     webui_manager.add_components("agent_settings", tab_components)
-
 
     llm_provider.change(
         lambda provider: update_model_dropdown(provider),
         inputs=[llm_provider],
         outputs=[llm_model_name]
     )
-
-    async def update_wrapper(mcp_file):
-        """Wrapper for handle_pause_resume."""
-        update_dict = await update_mcp_server(mcp_file, webui_manager)
-        yield update_dict
-

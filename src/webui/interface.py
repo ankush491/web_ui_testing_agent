@@ -2,10 +2,7 @@ import gradio as gr
 
 from src.webui.webui_manager import WebuiManager
 from src.webui.components.agent_settings_tab import create_agent_settings_tab
-from src.webui.components.browser_settings_tab import create_browser_settings_tab
 from src.webui.components.browser_use_agent_tab import create_browser_use_agent_tab
-from src.webui.components.deep_research_agent_tab import create_deep_research_agent_tab
-from src.webui.components.load_save_config_tab import create_load_save_config_tab
 
 theme_map = {
     "Default": gr.themes.Default(),
@@ -62,7 +59,7 @@ def create_ui(theme_name="Ocean"):
         with gr.Row():
             gr.Markdown(
                 """
-                # 🌐 AI based Testing Agent 
+                # 🌐 AI based Testing Agent
                 ### Control your browser with AI assistance
                 """,
                 elem_classes=["header-text"],
@@ -72,12 +69,7 @@ def create_ui(theme_name="Ocean"):
             with gr.TabItem("⚙️ Agent Settings"):
                 create_agent_settings_tab(ui_manager)
 
-           
             with gr.TabItem("🤖 Run Agent"):
                 create_browser_use_agent_tab(ui_manager)
 
-            with gr.TabItem("Action Log & Testing Report"):
-                create_browser_use_agent_tab(ui_manager)
-
-            
     return demo
