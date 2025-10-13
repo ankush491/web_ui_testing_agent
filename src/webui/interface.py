@@ -59,7 +59,7 @@ def create_ui(theme_name="Ocean"):
         with gr.Row():
             gr.Markdown(
                 """
-                # 🌐 AI based Testing Agent
+                # 🌐 Browser Use WebUI
                 ### Control your browser with AI assistance
                 """,
                 elem_classes=["header-text"],
@@ -71,5 +71,5 @@ def create_ui(theme_name="Ocean"):
 
             with gr.TabItem("🤖 Run Agent"):
                 create_browser_use_agent_tab(ui_manager)
-
+                
     return demo

@@ -1,15 +1,5 @@
 import os
-
-def strtobool(val):
-    val = val.lower()
-    if val in ('y', 'yes', 't', 'true', 'on', '1'):
-        return 1
-    elif val in ('n', 'no', 'f', 'false', 'off', '0'):
-        return 0
-    else:
-        raise ValueError(f"Invalid truth value {val}")
-
-
+from distutils.util import strtobool
 import gradio as gr
 import logging
 from gradio.components import Component

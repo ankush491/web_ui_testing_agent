@@ -24,25 +24,6 @@ def update_model_dropdown(llm_provider):
         return gr.Dropdown(choices=[], value="", interactive=True, allow_custom_value=True)
 
 
-async def update_mcp_server(mcp_file: str, webui_manager: WebuiManager):
-    """
-    Update the MCP server.
-    """
-    if hasattr(webui_manager, "bu_controller") and webui_manager.bu_controller:
-        logger.warning("⚠️ Close controller because mcp file has changed!")
-        await webui_manager.bu_controller.close_mcp_client()
-        webui_manager.bu_controller = None
-
-    if not mcp_file or not os.path.exists(mcp_file) or not mcp_file.endswith('.json'):
-        logger.warning(f"{mcp_file} is not a valid MCP file.")
-        return None, gr.update(visible=False)
-
-    with open(mcp_file, 'r') as f:
-        mcp_server = json.load(f)
-
-    return json.dumps(mcp_server, indent=2), gr.update(visible=True)
-
-
 def create_agent_settings_tab(webui_manager: WebuiManager):
     """
     Creates an agent settings tab.
@@ -76,7 +57,7 @@ def create_agent_settings_tab(webui_manager: WebuiManager):
             llm_api_key = gr.Textbox(
                 label="API Key",
                 type="password",
-                value="AIzaSyALO6BFkRzLymfsphdNCzR2t2LST9B2Cg8",
+                value="AIzaSyAjiMsnm31i-6zZbM7_JeHL5n_ajGqUkIE",
                 info="Your API key (leave blank to use .env)"
             )
 
