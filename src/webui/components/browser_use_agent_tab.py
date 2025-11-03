@@ -24,6 +24,11 @@ from src.browser.custom_browser import CustomBrowser
 from src.controller.custom_controller import CustomController
 from src.utils import llm_provider
 from src.webui.webui_manager import WebuiManager
+from src.utils.report_generation import (
+    generate_human_readable_action_log,
+    generate_action_log,
+    generate_testing_report,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -142,20 +147,28 @@ async def _generate_llm_summary(
     history: AgentHistoryList,
     summary_llm: Optional[BaseChatModel]
 ):
-    """Generates a professional, accurate, and non-contradictory summary report from the execution history."""
-    logger.info("Generating professional QA summary report...")
+    """Generates only execution statistics summary."""
+    logger.info("Generating execution statistics...")
 
-    fallback_summary = (
-        "**Task Completed**\n"
+    errors = history.errors() if callable(getattr(history, 'errors', None)) else []
+    has_errors = errors and any(errors)
+
+    summary = (
+        "**Execution Statistics**\n"
+        f"- Total Actions: {len(history.history)}\n"
         f"- Duration: {history.total_duration_seconds():.2f} seconds\n"
         f"- Total Input Tokens: {history.total_input_tokens()}\n"
+        f"- Status: {'Failed' if has_errors else 'Success'}\n"
     )
+    
     if history.final_result():
-        fallback_summary += f"- Final Result: {history.final_result()}\n"
-    if history.errors() and any(history.errors()):
-        fallback_summary += f"- **Errors:**\n```\n{history.errors()}\n```\n"
-    else:
-        fallback_summary += "- Status: Success\n"
+        summary += f"- Final Result: {history.final_result()}\n"
+
+    # Add the summary to chat history
+    webui_manager.bu_chat_history.append(
+        {"role": "assistant", "content": summary}
+    )
+    return
 
     if not summary_llm:
         logger.info("No LLM provided for summary. Using basic summary.")
@@ -411,6 +424,17 @@ async def run_agent_task(
         }
 
         if agent_history:
+            # Generate deterministic, local reports first (using system timestamps)
+            try:
+                human_log = generate_human_readable_action_log(agent_history)
+                testing_report = generate_testing_report(task, agent_history)
+                # Append both to the assistant chat history as separate messages so the user sees accurate logs
+                webui_manager.bu_chat_history.append({"role": "assistant", "content": "### Action Log\n" + human_log})
+                webui_manager.bu_chat_history.append({"role": "assistant", "content": "### Testing Report\n" + testing_report})
+            except Exception as e:
+                logger.error(f"Failed to generate local reports: {e}", exc_info=True)
+
+            # Still call the LLM summary if available
             await _generate_llm_summary(webui_manager, agent_history, main_llm)
             if history_file:
                 with open(history_file, "w") as f:
